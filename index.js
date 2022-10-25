@@ -35,8 +35,9 @@ const server=app.listen(PORT,()=>{
 
 const io = socket(server, {
   cors: {
-    origin: ["https://socialapp-six.vercel.app/","http://localhost:3000"],
-    credentials: false,
+    origin: "https://socialapp-six.vercel.app/",
+    credentials: true,
+    methods: ["GET", "POST"],
   },
 }); 
 
