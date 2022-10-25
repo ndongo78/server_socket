@@ -55,7 +55,10 @@ io.on("connection",socket=>{
     const userTo=onlineUser.find(user=>user._id === data.receiverId)
     // console.log("userTo: ",userTo)
     // console.log("sendMessage",data) 
-    socket.to(userTo.socketId).emit('messages',data) 
+    if(userTo){
+     socket.to(userTo.socketId).emit('messages',data)  
+    }
+    
   })
 
   
@@ -72,7 +75,9 @@ io.on("connection",socket=>{
   socket.on("callUser", (data) => { 
     const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
     //console.log("firstchar",userTo)
-    io.to(userTo.socketId).emit("callUser", { signal:data.signal, from:data.from });
+    if(userTo){
+      io.to(userTo.socketId).emit("callUser", { signal:data.signal, from:data.from });
+    }
 });
 
 socket.on("answerCall", (data) => { 
