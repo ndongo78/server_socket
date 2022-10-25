@@ -24,7 +24,7 @@ const app=express()
 app.use(cors())
 
 
-app.get("/", (req,res)=>{
+app.use("/", (req,res)=>{
   res.send("welcome to node server")
 })
 
