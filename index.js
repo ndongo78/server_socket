@@ -73,10 +73,12 @@ io.on("connection",socket=>{
   })
  
   socket.on("callUser", (data) => { 
-    const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
-    //console.log("firstchar",userTo)
-    if(userTo){
-      io.to(userTo.socketId).emit("callUser", { signal:data.signal, from:data.from });
+    if(data.userToCall){
+      const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
+      console.log("firstchar",data)
+      if(userTo){
+        io.to(userTo.socketId).emit("callUser", { signal:data.signalData, from:data.from });
+      }
     }
 });
 
