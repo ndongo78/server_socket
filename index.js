@@ -45,7 +45,7 @@ io.on("connection",socket=>{
   socket.emit('connection',socket.id)
 
   socket.on("register-new-user",data=>{
-    console.log("object",data);
+    //console.log("object",data);
     addUser(data)
     
     socket.emit("user-connected",onlineUser)
@@ -53,7 +53,7 @@ io.on("connection",socket=>{
 
   socket.on('sendMessage',(data)=>{
     const userTo=onlineUser.find(user=>user._id === data.receiverId)
-    // console.log("userTo: ",userTo)
+    console.log("userTo: ",userTo)
     // console.log("sendMessage",data) 
     if(userTo){
      socket.to(userTo.socketId).emit('messages',data)  
