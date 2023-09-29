@@ -1,15 +1,15 @@
 const express = require("express")
 const  socket =require ("socket.io")
 const cors = require("cors")
-const { ExpressPeerServer } = require("peer");
+// const { ExpressPeerServer } = require("peer");
 const http = require("http");
 const app=express()
 
 const server = http.createServer(app);
-const peerServer = ExpressPeerServer(server, {
-  debug: true,
-});
-app.use("/peerjs",peerServer);
+// const peerServer = ExpressPeerServer(server, {
+//   debug: true,
+// });
+// app.use("/peerjs",peerServer);
 const PORT=process.env.PORT || 5000
 let onlineUser=[]
 
