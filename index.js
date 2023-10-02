@@ -91,20 +91,27 @@ io.on("connect",socket=>{
     //console.log(data.userToCall);
     if(data.userToCall){
       const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
-      //console.log("userTo",userTo)
+      //console.log("userTo",data) 
       if(userTo){
-        io.to(userTo.socketId).emit("callUser", { signal:data.offerSdp, from:data.from });
+        io.to(userTo.socketId).emit("callUser", { signal:data.signalData, from:data.from });
       }
-    }
+    } 
 });
 
+// socket.on("answerCall", (data) => {
+//   io.to(data.to).emit("callAccepted", data.signal)
+// });
 socket.on("answerCall", (data) => { 
-  const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
+  //console.log(" answer",data)
+  const userTo=onlineUser.find(user=>user._id === data.to._id)
   //  console.log("signal",data);
-    io.to(userTo.socketId).emit("callAccepted", data)
+    io.to(userTo.socketId).emit("callAccepted", data.signal)
 });
 })
+
+
 
 server.listen(PORT,()=>{
   console.log (`server is running on http://localhost:${PORT}`)
 })
+ 
