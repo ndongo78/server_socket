@@ -88,19 +88,43 @@ io.on("connect",socket=>{
   })
  
   socket.on("callUser", (data) => { 
-    //console.log(data.userToCall);
+   //console.log(data);
     if(data.userToCall){
       const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
-      //console.log("userTo",data) 
+     //console.log("userTo",userTo) 
       if(userTo){
-        io.to(userTo.socketId).emit("callUser", { signal:data.signalData, from:data.from });
+        io.to(userTo.socketId).emit("callUser", { signal:data.signalData, from:data.from,offer:data.offer });
       }
     } 
 });
 
+socket.on("answerDescription", (data) => {
+  if(data.userToCall){
+    const userTo=onlineUser.find(user=>user._id === data.to._id)
+   //console.log("userTo",userTo) 
+    if(userTo){
+      socket.to(userTo.socketId).emit("answerDescription",data);
+    }
+  }
+  //socket.emit("answerDescription", data);
+});
+
+socket.on('iceCandidate', (data) => {
+  // console.log("iceCandidate",data);
+  if(data.userToCall){
+    const userTo=onlineUser.find(user=>user._id === data.to._id)
+   //console.log("userTo",userTo) 
+    if(userTo){
+      socket.to(userTo.socketId).emit("iceCandidate",data);
+    }
+  } 
+  
+})
+
 // socket.on("answerCall", (data) => {
 //   io.to(data.to).emit("callAccepted", data.signal)
 // });
+
 socket.on("answerCall", (data) => { 
   //console.log(" answer",data)
   const userTo=onlineUser.find(user=>user._id === data.to._id)
