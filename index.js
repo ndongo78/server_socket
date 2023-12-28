@@ -22,7 +22,6 @@ const addUser=(username)=>{
 
 const removeUser = (socketId) => {
   onlineUser = onlineUser.filter((user) => user.socketId !== socketId);
-
 }; 
 
 const getUser = (userId) => {
@@ -45,13 +44,13 @@ const io = socket(server, {
   },
 }); 
 
-io.on("connect",socket=>{
-  // console.log(`User connected: ${socket.id}`);
-  
-  socket.emit('connection',socket.id)
+io.on("connection",socket=>{
+   console.log(`User connected: ${socket.id}`);
+   
+  socket.emit('connection',socket.id) 
 
   socket.on("register-new-user",data=>{
-    //console.log("object",data);
+  //  console.log("user connnecter",data);
     addUser(data)
     
     socket.emit("user-connected",onlineUser)
@@ -63,16 +62,46 @@ io.on("connect",socket=>{
   // })
 
   socket.on('sendMessage',(data)=>{
+    console.log("sendMessage",data)
     const userTo=onlineUser.find(user=>user._id === data.receiverId)
     //console.log("userTo: ",userTo)
-    // console.log("sendMessage",data) 
+
     if(userTo){
-     socket.to(userTo.socketId).emit('messages',data)  
+     socket.to(userTo.socketId).emit('messages',data)   
     }
-    
   })
 
-  
+  socket.on('friendRequest',(data)=>{
+    // console.log("friendRequest",data)
+    const userTo=onlineUser.find(user=>user._id === data.receiver._id)
+    // console.log("userTo: ",userTo)
+
+    if(userTo){
+     socket.to(userTo.socketId).emit('friendRequest',data)   
+    }
+  })
+  socket.on('requestAccepted',(data)=>{
+    //onsole.log("requestAccepted",data)
+    const userTo=onlineUser.find(user=>user._id === data.receiver._id)
+    // console.log("userTo: ",userTo)
+
+    if(userTo){
+     socket.to(userTo.socketId).emit('requestAccepted',data)   
+    }
+  })  
+  socket.on('writing',(data)=>{
+    // console.log("requestAccepted",data)
+    const userTo=onlineUser.find(user=>user._id === data.receiver._id)
+    // console.log("userTo: ",userTo)
+ 
+    if(userTo){
+     socket.to(userTo.socketId).emit('writing',data)    
+    } 
+  })
+  socket.on('logOut',(data)=>{
+    removeUser(socket.id);
+    io.emit("updated-users", onlineUser);
+  })
   socket.on("disconnect", (data) => {
     //console.log("a user disconnected!");
   
@@ -87,16 +116,33 @@ io.on("connect",socket=>{
     console.log("socket error");
   })
  
-  socket.on("callUser", (data) => { 
+  socket.on("callUser", (data) => {
    //console.log(data);
     if(data.userToCall){
       const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
-     //console.log("userTo",userTo) 
+    console.log("userTo",userTo)
       if(userTo){
-        io.to(userTo.socketId).emit("callUser", { signal:data.signalData, from:data.from,offer:data.offer });
+        io.to(userTo.socketId).emit("notifierCall", data);
       }
-    } 
+    }
 });
+  socket.on('iceCandidate', (data) => {
+    console.log("iceCandidate",data);
+    if(data.called){
+      const userTo=onlineUser.find(user=>user._id === data.called._id)
+      //console.log("userTo",userTo)
+      if(userTo){
+        socket.to(userTo.socketId).emit("iceCandidate",data);
+      }
+    }
+  })
+  socket.on("answerCall", (data) => {
+    console.log(" answer",data)
+    const userTo=onlineUser.find(user=>user._id === data.caller._id)
+    //  console.log("signal",data);
+    io.to(userTo.socketId).emit("callAccepted", data)
+  });
+
 
 socket.on("answerDescription", (data) => {
   if(data.userToCall){
@@ -109,29 +155,25 @@ socket.on("answerDescription", (data) => {
   //socket.emit("answerDescription", data);
 });
 
-socket.on('iceCandidate', (data) => {
-  // console.log("iceCandidate",data);
-  if(data.userToCall){
-    const userTo=onlineUser.find(user=>user._id === data.to._id)
-   //console.log("userTo",userTo) 
-    if(userTo){
-      socket.to(userTo.socketId).emit("iceCandidate",data);
-    }
-  } 
-  
-})
 
+  socket.on('audioCall',data=>{
+    const userTo=onlineUser.find(user=>user._id === data.to._id)
+    console.log("signal",data);
+    io.to(userTo.socketId).emit("notifierCall", data)
+  });
+
+  socket.on('audioCallResponse',data=>{
+    const userTo=onlineUser.find(user=>user._id === data.to._id)
+    console.log("audioCallResponse",data);
+    io.to(userTo.socketId).emit("audioCallResponse", data)
+  });
 // socket.on("answerCall", (data) => {
 //   io.to(data.to).emit("callAccepted", data.signal)
 // });
 
-socket.on("answerCall", (data) => { 
-  //console.log(" answer",data)
-  const userTo=onlineUser.find(user=>user._id === data.to._id)
-  //  console.log("signal",data);
-    io.to(userTo.socketId).emit("callAccepted", data.signal)
+
 });
-})
+
 
 
 
