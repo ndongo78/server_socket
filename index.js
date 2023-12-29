@@ -140,8 +140,9 @@ io.on("connection",socket=>{
     console.log(" answer",data)
     const userTo=onlineUser.find(user=>user._id === data.caller._id)
     //  console.log("signal",data);
-    io.to(userTo.socketId).emit("callAccepted", data)
-  });
+    io.to(userTo.socketId).emit("callAccepted", data) 
+  });  
+  
 
 
 socket.on("answerDescription", (data) => {
